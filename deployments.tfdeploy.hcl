@@ -34,11 +34,10 @@ deployment "production" {
 
 # deployments.tfdeploy.hcl
 
-orchestrate "auto_approve" "no_changes" {
-    check {
-        # Check that the pet component has no changes
-        condition = context.plan.component_changes["component.lambda"].total == 0
-        reason = "Not automatically approved because changes proposed to pet component."
-    }
+orchestrate "auto_approve" "safe_plans_dev" {
+  check {
+    # Only auto-approve in developement environment if no resources are being removed
+    condition = context.plan.changes.remove == 0 && context.plan.deployment == developement
+    reson = "Plan has ${context.plan.changes.remove} resources to be removed."
+  }
 }
-
